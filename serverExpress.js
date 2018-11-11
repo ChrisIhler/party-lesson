@@ -10,7 +10,8 @@ var port = process.env.PORT || 8000
 
 app.disable('x-powered-by')
 
-//step 3 addition. 
+//step 3 addition allows the path to get all the information added in the newly 
+//created guests.json file.  
 app.get('/guests', function(req, res) {
   fs.readFile(guestsPath, 'utf8', function(err, guestsJSON) {
     if (err) {
@@ -24,6 +25,25 @@ app.get('/guests', function(req, res) {
   });
 });
 
+//step 4 adding the ability to access individual items from the guests.json file 
+app.get('/guests/:id', function(req, res) {
+  fs.readFile(guestsPath, 'utf8', function(err, guestsJSON){
+    if (err) {
+      console.error(err.stack);
+      return res.sendStatus(500);
+    }
+
+    var id = Number.parseInt(req.params.id);
+    var guests = JSON.parse(guestsJSON);
+
+    if (id < 0 || id >= guests.length || Number.isNaN(id)) {
+      return res.sendStatus(404);
+    }
+
+    res.set('Content-Type', 'text/plain');
+    res.send(guests[id]);
+  });
+});
 
 //step 2
 // app.get('/guests', function(req, res) {
